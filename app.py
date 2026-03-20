@@ -63,6 +63,7 @@ def generate_speech(
                         delete=False, suffix=".wav"
                     )
                     prompt_path = temp_prompt.name
+                    temp_prompt.close()
                     sf.write(prompt_path, audio_data, sr)
             else:
                 raise gr.Error(
@@ -93,10 +94,12 @@ def generate_speech(
             # Save output (48kHz for normal, 24kHz for smooth)
             sample_rate = 24000 if return_smooth else 48000
             temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
-            sf.write(temp_file.name, final_wav, sample_rate)
+            out_path = temp_file.name
+            temp_file.close()
+            sf.write(out_path, final_wav, sample_rate)
 
             return (
-                temp_file.name,
+                out_path,
                 f"Audio generated successfully! Sample rate: {sample_rate}Hz",
             )
         finally:

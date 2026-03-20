@@ -1,4 +1,28 @@
+--find-links https://k2-fsa.github.io/icefall/piper_phonemize.html
+
+# Gradio UI
 gradio>=4.0.0
 soundfile>=0.12.1
+
+# LuxTTS from Git (zipvoice.luxvoice); LinaCodec from Git (not on PyPI as used by LuxTTS).
+torch
+torchaudio
 numpy>=1.21.0
+lhotse
+huggingface_hub
+safetensors
+tensorboard
+vocos
+pydub
+onnxruntime
+git+https://github.com/ysharma3501/LinaCodec.git
 librosa>=0.10.0
+transformers<=4.57.6
+cn2an
+inflect
+jieba
+piper_phonemize
+pypinyin
+setuptools<81
+
+git+https://github.com/ysharma3501/LuxTTS.git

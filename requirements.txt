@@ -24,4 +24,4 @@ piper_phonemize
 pypinyin
 setuptools<81
 
-git+https://github.com/ysharma3501/LuxTTS.git
+# LuxTTS is installed with --no-deps in install.js step 2 to avoid linacodec PyPI resolution failure.

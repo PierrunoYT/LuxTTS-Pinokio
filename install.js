@@ -10,6 +10,13 @@ module.exports = {
       },
     },
     {
+      method: "shell.run",
+      params: {
+        venv: "env",
+        message: "uv pip install git+https://github.com/ysharma3501/LuxTTS.git --no-deps",
+      },
+    },
+    {
       method: "script.start",
       params: {
         uri: "torch.js",

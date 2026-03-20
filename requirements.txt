@@ -5,8 +5,7 @@ gradio>=4.0.0
 soundfile>=0.12.1
 
 # LuxTTS from Git (zipvoice.luxvoice); LinaCodec from Git (not on PyPI as used by LuxTTS).
-torch
-torchaudio
+# torch / torchaudio: installed by torch.js in install.js (CUDA/ROCm/DirectML/CPU per machine).
 numpy>=1.21.0
 lhotse
 huggingface_hub

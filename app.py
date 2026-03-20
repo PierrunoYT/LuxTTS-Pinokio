@@ -111,7 +111,7 @@ def generate_speech(
 
 
 # Create Gradio interface
-with gr.Blocks(title="LuxTTS 🎙️", theme=gr.themes.Default()) as demo:
+with gr.Blocks(title="LuxTTS 🎙️") as demo:
     gr.Markdown("# LuxTTS 🎙️")
     gr.Markdown(
         "High-quality rapid TTS voice cloning model - 150x+ realtime, 48kHz speech generation"
@@ -127,9 +127,8 @@ with gr.Blocks(title="LuxTTS 🎙️", theme=gr.themes.Default()) as demo:
             )
 
             prompt_file = gr.Audio(
-                label="Reference Audio (for voice cloning)",
+                label="Reference Audio (for voice cloning) — min 3 s, WAV/MP3/FLAC",
                 type="filepath",
-                info="Upload a minimum 3-second audio file (WAV/MP3/FLAC supported)",
             )
 
             with gr.Accordion("Advanced Settings", open=False):
@@ -309,4 +308,5 @@ if __name__ == "__main__":
         server_port=args.port,
         share=False,
         inbrowser=False,
+        theme=gr.themes.Default(),
     )

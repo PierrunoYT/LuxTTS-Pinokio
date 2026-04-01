@@ -7,7 +7,7 @@ import tempfile
 import torch
 import torchaudio
 
-PROMPT_SR = 24000  # Sample rate LuxTTS expects for reference audio
+PROMPT_SR = 48000  # Sample rate LuxTTS expects for reference audio
 
 # Model cache
 loaded_models = {}

@@ -103,15 +103,11 @@ def generate_speech(
 
             final_wav = np.asarray(final_wav).squeeze()
 
-            # Save output (48kHz for normal, 24kHz for smooth)
+            # Return numpy array directly to avoid Gradio file-serving Content-Length issues
             sample_rate = 24000 if return_smooth else 48000
-            temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
-            out_path = temp_file.name
-            temp_file.close()
-            sf.write(out_path, final_wav, sample_rate)
 
             return (
-                out_path,
+                (sample_rate, final_wav),
                 f"Audio generated successfully! Sample rate: {sample_rate}Hz",
             )
         finally:
@@ -225,7 +221,7 @@ with gr.Blocks(title="LuxTTS 🎙️") as demo:
             generate_btn = gr.Button("Generate Speech 🎵", variant="primary")
 
         with gr.Column():
-            audio_output = gr.Audio(label="Generated Audio", type="filepath")
+            audio_output = gr.Audio(label="Generated Audio")
             status_text = gr.Textbox(label="Status", interactive=False)
 
     gr.Examples(

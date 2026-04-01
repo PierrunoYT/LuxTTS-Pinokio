@@ -1,9 +1,13 @@
+import os
 import gradio as gr
 import soundfile as sf
 from zipvoice.luxvoice import LuxTTS
 import numpy as np
 import tempfile
 import torch
+import torchaudio
+
+PROMPT_SR = 24000  # Sample rate LuxTTS expects for reference audio
 
 # Model cache
 loaded_models = {}
@@ -54,6 +58,14 @@ def generate_speech(
                     )
                 else:
                     audio_data = audio_data.astype(np.float32)
+
+                # Resample to the rate LuxTTS expects for prompt encoding
+                if sr != PROMPT_SR:
+                    audio_tensor = torch.from_numpy(audio_data).unsqueeze(0)
+                    audio_data = torchaudio.functional.resample(
+                        audio_tensor, sr, PROMPT_SR
+                    ).squeeze(0).numpy()
+                    sr = PROMPT_SR
 
                 # Create temp file if needed
                 if prompt_file.endswith(".wav") or prompt_file.endswith(".flac"):
@@ -285,7 +297,6 @@ with gr.Blocks(title="LuxTTS 🎙️") as demo:
 
 if __name__ == "__main__":
     import argparse
-    import os
 
     parser = argparse.ArgumentParser(description="LuxTTS Gradio Interface")
     parser.add_argument(

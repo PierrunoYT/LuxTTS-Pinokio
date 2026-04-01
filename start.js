@@ -6,9 +6,9 @@ module.exports = {
       method: "shell.run",
       params: {
         venv: "env",
-        env: { },
+        env: { PYTHONUNBUFFERED: "1" },
         message: [
-          "python app.py",
+          "python -u app.py 2>&1",
         ],
         on: [{
           // Monitor for Gradio server URL

@@ -177,7 +177,7 @@ with gr.Blocks(title="LuxTTS 🎙️") as demo:
                     maximum=20,
                     step=0.5,
                     value=5,
-                    info="Set lower to speed up inference",
+                    info="Set lower to speed up inference. If you hear artifacts, try setting this to the maximum.",
                 )
 
                 prompt_rms = gr.Slider(

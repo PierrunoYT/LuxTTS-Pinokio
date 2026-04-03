@@ -11,8 +11,8 @@ module.exports = {
           "python -u app.py 2>&1",
         ],
         on: [{
-          // Monitor for Gradio server URL
-          "event": "/http:\\/\\/\\S+/",
+          // Capture full http(s) URL for local.set (group 1 per Pinokio / Gepeto pattern)
+          "event": "/(https?:\\/\\/\\S+)/",
           "done": true
         }]
       }
@@ -21,8 +21,7 @@ module.exports = {
     {
       method: "local.set",
       params: {
-        // Use the captured URL from the previous step
-        url: "{{input.event[0]}}"
+        url: "{{input.event[1]}}"
       }
     },
   ]

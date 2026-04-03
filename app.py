@@ -275,6 +275,7 @@ with gr.Blocks(title="LuxTTS 🎙️") as demo:
 
     generate_btn.click(
         fn=generate_speech,
+        api_name="generate_speech",
         inputs=[
             text_input,
             prompt_file,

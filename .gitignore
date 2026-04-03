@@ -21,6 +21,9 @@ wheels/
 *.egg
 MANIFEST
 
+# Pinokio install marker (written by install.js)
+INSTALLATION_COMPLETE.txt
+
 # Virtual environments
 higgs_audio_env/
 venv/
@@ -77,6 +80,7 @@ data/
 datasets/
 *.csv
 *.json
+!pinokio.json
 *.xml
 
 # IDE

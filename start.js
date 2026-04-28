@@ -5,6 +5,7 @@ module.exports = {
       method: "shell.run",
       params: {
         venv: "env",
+        path: "app",
         message: "python app.py --port {{port}}",
         on: [{
           event: "/(https?:\\/\\/\\S+)/",

@@ -67,16 +67,15 @@ def generate_speech(
                     ).squeeze(0).numpy()
                     sr = PROMPT_SR
 
-                # Create temp file if needed
-                if prompt_file.endswith(".wav") or prompt_file.endswith(".flac"):
-                    prompt_path = prompt_file
-                else:
-                    temp_prompt = tempfile.NamedTemporaryFile(
-                        delete=False, suffix=".wav"
-                    )
-                    prompt_path = temp_prompt.name
-                    temp_prompt.close()
-                    sf.write(prompt_path, audio_data, sr)
+                # Always write the processed (resampled, mono, float32) audio to a
+                # temp file so the model always receives audio at the correct sample
+                # rate, even when the original upload was already a WAV/FLAC.
+                temp_prompt = tempfile.NamedTemporaryFile(
+                    delete=False, suffix=".wav"
+                )
+                prompt_path = temp_prompt.name
+                temp_prompt.close()
+                sf.write(prompt_path, audio_data, sr)
             else:
                 raise gr.Error(
                     "Please upload a reference audio file for voice cloning."

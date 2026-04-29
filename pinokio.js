@@ -4,7 +4,7 @@ module.exports = {
   description: "High-quality rapid TTS voice cloning model (150x+ realtime) — 48kHz speech, voice cloning",
   icon: "icon.jpg",
   menu: async (kernel, info) => {
-    let installed = info.exists("env")
+    let installed = info.exists("app/env")
     let running = {
       install: info.running("install.js"),
       start: info.running("start.js"),

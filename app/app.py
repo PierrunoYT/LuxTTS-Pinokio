@@ -102,11 +102,17 @@ def generate_speech(
 
             final_wav = np.asarray(final_wav).squeeze()
 
-            # Return numpy array directly to avoid Gradio file-serving Content-Length issues
             sample_rate = 24000 if return_smooth else 48000
 
+            # Normalise and convert to int16 so Gradio doesn't silently clip
+            # when auto-converting from float32.
+            peak = np.abs(final_wav).max()
+            if peak > 0:
+                final_wav = final_wav / peak
+            final_wav_int16 = (final_wav * 32767).clip(-32768, 32767).astype(np.int16)
+
             return (
-                (sample_rate, final_wav),
+                (sample_rate, final_wav_int16),
                 f"Audio generated successfully! Sample rate: {sample_rate}Hz",
             )
         finally:

@@ -1,16 +1,6 @@
 module.exports = {
   run: [
     {
-      method: "script.start",
-      params: {
-        uri: "torch.js",
-        params: {
-          venv: "env",
-          path: "app",
-        },
-      },
-    },
-    {
       method: "shell.run",
       params: {
         venv: "env",
@@ -19,6 +9,16 @@ module.exports = {
           "uv pip install -r requirements.txt",
           "uv pip install git+https://github.com/ysharma3501/LuxTTS.git --no-deps",
         ],
+      },
+    },
+    {
+      method: "script.start",
+      params: {
+        uri: "torch.js",
+        params: {
+          venv: "env",
+          path: "app",
+        },
       },
     },
     {

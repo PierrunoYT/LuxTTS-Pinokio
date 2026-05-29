@@ -1,4 +1,7 @@
 {
+  "title": "LuxTTS 🎙️",
+  "description": "High-quality rapid TTS voice cloning model (150x+ realtime) — 48kHz speech, voice cloning",
+  "icon": "icon.jpg",
   "posts": [],
   "links": [
     {

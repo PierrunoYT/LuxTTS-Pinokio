@@ -1,17 +1,5 @@
 {
   "title": "LuxTTS 🎙️",
   "description": "High-quality rapid TTS voice cloning model (150x+ realtime) — 48kHz speech, voice cloning",
-  "icon": "icon.jpg",
-  "posts": [],
-  "links": [
-    {
-      "title": "LuxTTS",
-      "links": [
-        {
-          "title": "Upstream (LuxTTS)",
-          "value": "https://github.com/ysharma3501/LuxTTS"
-        }
-      ]
-    }
-  ]
+  "icon": "icon.jpg"
 }

@@ -1,4 +1,3 @@
-import os
 import time
 import torch
 import numpy as np
@@ -150,10 +149,15 @@ with gr.Blocks(title="LuxTTS 🎙️", theme=gr.themes.Soft()) as demo:
                     value="YatharthS/LuxTTS",
                     info="Hugging Face repo ID or local path",
                 )
+                device_choices = ["cpu"]
+                if torch.cuda.is_available():
+                    device_choices.insert(0, "cuda")
+                if torch.backends.mps.is_available():
+                    device_choices.append("mps")
                 device = gr.Radio(
                     label="Device",
-                    choices=["cuda", "cpu", "mps"] if torch.cuda.is_available() else ["cpu", "mps"],
-                    value="cuda" if torch.cuda.is_available() else "cpu",
+                    choices=device_choices,
+                    value=device_choices[0],
                 )
                 threads = gr.Slider(
                     1, 16, value=2, step=1,

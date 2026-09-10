@@ -6,9 +6,12 @@ module.exports = {
       params: {
         venv: "env",
         path: "app",
-        message: "python app.py --port {{port}}",
+        message: "python -u app.py --port {{port}}",
         on: [{
-          event: "/(https?:\\/\\/\\S+)/",
+          // Match Gradio's own banner rather than the first URL on stdout —
+          // model downloads and version notices print URLs before the server
+          // is up, and those would be captured as the Web UI link.
+          event: "/Running on local URL:\\s+(https?:\\/\\/\\S+)/",
           done: true
         }]
       }

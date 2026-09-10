@@ -21,7 +21,7 @@ wheels/
 *.egg
 MANIFEST
 
-# Pinokio install marker (written by install.js)
+# Legacy Pinokio install marker (no longer written; kept so old installs stay clean)
 INSTALLATION_COMPLETE.txt
 
 # Virtual environments

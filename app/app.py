@@ -1,23 +1,69 @@
+import threading
 import time
 import torch
 import numpy as np
 import gradio as gr
 from zipvoice.luxvoice import LuxTTS
 
+DEFAULT_MODEL_PATH = "YatharthS/LuxTTS"
+DEFAULT_THREADS = 2
+
+
+def mps_available():
+    """True only when this torch build actually ships a working MPS backend."""
+    backend = getattr(torch.backends, "mps", None)
+    if backend is None:
+        return False
+    try:
+        return bool(backend.is_built() and backend.is_available())
+    except Exception:
+        return False
+
+
+def default_device():
+    return "cuda" if torch.cuda.is_available() else "cpu"
+
+
 # ---------------------------------------------------------------------------
-# Model cache — keyed by (model_path, device, threads) so the model is only
-# reloaded when the user actually changes one of those settings.
+# Model cache — a single slot keyed by (model_path, device, threads). Only one
+# model is held at a time: keeping every combination the user tried would pin
+# a full copy of the weights per device, which exhausts VRAM after a couple of
+# switches. The lock keeps concurrent Gradio requests from loading twice.
 # ---------------------------------------------------------------------------
-loaded_models = {}
+_model_lock = threading.Lock()
+_cached = {"key": None, "model": None}
 
 
 def get_model(model_path, device, threads):
     key = (model_path, device, int(threads))
-    if key not in loaded_models:
-        print(f"Loading LuxTTS model: {model_path}…")
-        loaded_models[key] = LuxTTS(model_path, device=device, threads=int(threads))
-        print("Model loaded successfully!")
-    return loaded_models[key]
+    with _model_lock:
+        if _cached["key"] != key:
+            # Drop the previous model before allocating the next one.
+            _cached["key"] = None
+            _cached["model"] = None
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+
+            print(f"Loading LuxTTS model: {model_path}…")
+            _cached["model"] = LuxTTS(model_path, device=device, threads=int(threads))
+            _cached["key"] = key
+            print("Model loaded successfully!")
+        return _cached["model"]
+
+
+def as_float(value, default):
+    """Gradio hands back None when a Number field is cleared."""
+    try:
+        return default if value is None else float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def as_int(value, default):
+    try:
+        return default if value is None else int(value)
+    except (TypeError, ValueError):
+        return default
 
 
 # ---------------------------------------------------------------------------
@@ -42,22 +88,22 @@ def generate_speech(
         return None, "⚠️ Please upload a reference audio file."
 
     try:
-        model = get_model(model_path, device, threads)
+        model = get_model(model_path, device, as_int(threads, DEFAULT_THREADS))
 
         start = time.time()
 
         encoded_prompt = model.encode_prompt(
             audio_prompt,
-            duration=float(ref_duration),
-            rms=float(rms),
+            duration=as_float(ref_duration, 5.0),
+            rms=as_float(rms, 0.01),
         )
 
         final_wav = model.generate_speech(
             text,
             encoded_prompt,
-            num_steps=int(num_steps),
-            t_shift=float(t_shift),
-            speed=float(speed),
+            num_steps=as_int(num_steps, 4),
+            t_shift=as_float(t_shift, 0.9),
+            speed=as_float(speed, 0.8),
             return_smooth=bool(return_smooth),
         )
 
@@ -67,6 +113,12 @@ def generate_speech(
             final_wav = final_wav.detach().cpu().squeeze().numpy()
         else:
             final_wav = np.asarray(final_wav).squeeze()
+
+        # squeeze() can collapse a single-sample result to a 0-d array, and an
+        # empty result would make the peak computation below raise.
+        final_wav = np.atleast_1d(np.asarray(final_wav, dtype=np.float32))
+        if final_wav.size == 0:
+            return None, "❌ The model returned no audio. Try a longer reference clip."
 
         # Normalise and convert to int16 — avoids Gradio silently clipping
         # a float32 array during its own auto-conversion.
@@ -146,21 +198,21 @@ with gr.Blocks(title="LuxTTS 🎙️", theme=gr.themes.Soft()) as demo:
             with gr.Accordion("Advanced Settings", open=False):
                 model_path = gr.Textbox(
                     label="Model Path",
-                    value="YatharthS/LuxTTS",
+                    value=DEFAULT_MODEL_PATH,
                     info="Hugging Face repo ID or local path",
                 )
                 device_choices = ["cpu"]
                 if torch.cuda.is_available():
                     device_choices.insert(0, "cuda")
-                if torch.backends.mps.is_available():
+                if mps_available():
                     device_choices.append("mps")
                 device = gr.Radio(
                     label="Device",
                     choices=device_choices,
-                    value=device_choices[0],
+                    value=default_device() if default_device() in device_choices else device_choices[0],
                 )
                 threads = gr.Slider(
-                    1, 16, value=2, step=1,
+                    1, 16, value=DEFAULT_THREADS, step=1,
                     label="CPU Threads",
                     visible=False,
                 )
@@ -190,6 +242,10 @@ with gr.Blocks(title="LuxTTS 🎙️", theme=gr.themes.Soft()) as demo:
         outputs=[audio_output, status_text],
     )
 
+    # Only one generation runs at a time — the model slot below holds a single
+    # instance, so parallel requests would fight over the same weights.
+    demo.queue(default_concurrency_limit=1)
+
 
 if __name__ == "__main__":
     import argparse
@@ -201,8 +257,7 @@ if __name__ == "__main__":
 
     print("Initializing LuxTTS model…")
     try:
-        get_model("YatharthS/LuxTTS", "cuda" if torch.cuda.is_available() else "cpu", 2)
-        print("Model loaded successfully!")
+        get_model(DEFAULT_MODEL_PATH, default_device(), DEFAULT_THREADS)
     except Exception as e:
         print(f"Warning: could not pre-load model: {e}")
 

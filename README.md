@@ -4,7 +4,7 @@ Pinokio launcher for [LuxTTS](https://github.com/ysharma3501/LuxTTS): fast voice
 
 ## What it does
 
-- **Install** — Creates the Python virtualenv at `app/env`, installs `app/requirements.txt` with `uv`, installs LuxTTS itself with `--no-deps` (its `linacodec` dependency is not on PyPI), then runs `torch.js` to put the right PyTorch build on your platform.
+- **Install** — Creates the Python virtualenv at `app/env`, installs `app/requirements.txt` with `uv`, installs LuxTTS itself with `--no-deps` (its `linacodec` dependency is not on PyPI), then runs `torch.js` to put the right PyTorch build on your platform. Checks that the core dependencies import successfully before marking the installation complete.
 - **Start** — Runs `python -u app.py` and opens the Gradio URL in Pinokio when the server prints it.
 - **Update** — `git pull`, then re-runs `install.js`.
 - **Reset** — Removes `app/env` so you can reinstall cleanly.
@@ -17,6 +17,8 @@ The sidebar icon is `icon.jpg` in the project root, declared in `pinokio.json`.
 1. Open this project in Pinokio.
 2. Click **Install**, wait for it to finish.
 3. Click **Start**; use **Open Web UI** when it appears, or open the URL shown in the terminal.
+
+If startup reports `No module named 'torch'`, run **Install** again and inspect the installation terminal for errors. An environment folder alone does not mean installation succeeded: the launcher enables **Start** after verification creates `app/env/.installed`. Existing installations need to run **Install** once to create this marker. Each installation attempt clears the previous marker, and **Reset** removes it with the environment.
 
 Default server bind is **`127.0.0.1`** and port **`7860`** (see `app/app.py` arguments); Pinokio passes its own `--port`.
 

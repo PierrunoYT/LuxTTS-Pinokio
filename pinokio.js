@@ -1,7 +1,7 @@
 module.exports = {
   version: "7.0",
   menu: async (kernel, info) => {
-    let installed = info.exists("app/env")
+    let installed = info.exists("app/env/.installed")
     let running = {
       install: info.running("install.js"),
       start: info.running("start.js"),
@@ -16,7 +16,7 @@ module.exports = {
         text: "Installing",
         href: "install.js",
       }]
-    } else if (installed) {
+    } else if (installed || running.start || running.update || running.reset || running.link) {
       if (running.start) {
         let local = info.local("start.js")
         if (local && local.url) {

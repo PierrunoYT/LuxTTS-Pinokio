@@ -37,7 +37,7 @@ base = "http://127.0.0.1:7860"  # use the URL from Pinokio / terminal
 client = Client(base)
 
 # Argument order matches the UI: text, reference audio path, model path, device, threads,
-# prompt_duration, prompt_rms, num_steps, t_shift, speed, return_smooth
+# ref_duration, rms, num_steps, t_shift, speed, return_smooth
 result = client.predict(
     "Hello from LuxTTS.",
     "/path/to/reference.wav",

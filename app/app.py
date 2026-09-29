@@ -21,7 +21,11 @@ def mps_available():
 
 
 def default_device():
-    return "cuda" if torch.cuda.is_available() else "cpu"
+    if torch.cuda.is_available():
+        return "cuda"
+    if mps_available():
+        return "mps"
+    return "cpu"
 
 
 # ---------------------------------------------------------------------------

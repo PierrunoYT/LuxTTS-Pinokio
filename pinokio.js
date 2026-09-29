@@ -86,12 +86,23 @@ module.exports = {
         }]
       }
     } else {
-      return [{
+      let menu = [{
         default: true,
         icon: "fa-solid fa-plug",
         text: "Install",
         href: "install.js",
       }]
+      // A leftover env without the marker means a failed install — offer
+      // Reset so it can be wiped instead of reinstalling over a broken venv.
+      if (info.exists("app/env")) {
+        menu.push({
+          icon: "fa-regular fa-circle-xmark",
+          text: "<div><strong>Reset</strong><div>Revert to pre-install state</div></div>",
+          href: "reset.js",
+          confirm: "Are you sure you wish to reset the app?"
+        })
+      }
+      return menu
     }
   }
 }

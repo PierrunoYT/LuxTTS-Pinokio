@@ -215,10 +215,17 @@ with gr.Blocks(title="LuxTTS 🎙️", theme=gr.themes.Soft()) as demo:
                     choices=device_choices,
                     value=default_device() if default_device() in device_choices else device_choices[0],
                 )
+                # Threads only apply to the CPU (ONNX) path, so show the slider
+                # only while cpu is selected.
                 threads = gr.Slider(
                     1, 16, value=DEFAULT_THREADS, step=1,
                     label="CPU Threads",
-                    visible=False,
+                    visible=device.value == "cpu",
+                )
+                device.change(
+                    fn=lambda d: gr.update(visible=d == "cpu"),
+                    inputs=device,
+                    outputs=threads,
                 )
 
             generate_btn = gr.Button("Generate Speech 🎵", variant="primary")

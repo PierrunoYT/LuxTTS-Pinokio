@@ -86,6 +86,7 @@ def generate_speech(
     speed,
     return_smooth,
 ):
+    text = (text or "").strip()
     if not text:
         return None, "⚠️ Please enter text to synthesize."
     if audio_prompt is None:

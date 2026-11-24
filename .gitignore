@@ -81,6 +81,8 @@ datasets/
 *.csv
 *.json
 !pinokio.json
+!package.json
+!package-lock.json
 *.xml
 
 # IDE

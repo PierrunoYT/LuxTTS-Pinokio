@@ -119,20 +119,18 @@ def generate_speech(
         else:
             final_wav = np.asarray(final_wav).squeeze()
 
-        # squeeze() can collapse a single-sample result to a 0-d array, and an
-        # empty result would make the peak computation below raise.
+        # squeeze() can collapse a single-sample result to a 0-d array.
         final_wav = np.atleast_1d(np.asarray(final_wav, dtype=np.float32))
         if final_wav.size == 0:
             return None, "❌ The model returned no audio. Try a longer reference clip."
 
-        # Normalise and convert to int16 — avoids Gradio silently clipping
-        # a float32 array during its own auto-conversion.
-        peak = np.abs(final_wav).max()
-        if peak > 0:
-            final_wav = final_wav / peak
+        # LuxTTS already clamps to [-1, 1] and applies RMS volume matching, so
+        # convert straight to int16 without re-normalising the level.
         final_wav = (np.clip(final_wav, -1.0, 1.0) * 32767).astype(np.int16)
 
-        sample_rate = 24000 if return_smooth else 48000
+        # The vocoder outputs 48 kHz in both modes (the smooth head is
+        # resampled from 24 kHz to 48 kHz before it is returned).
+        sample_rate = 48000
 
         return (sample_rate, final_wav), f"✨ Generated in **{elapsed}s** at {sample_rate} Hz."
 
@@ -197,14 +195,14 @@ with gr.Blocks(title="LuxTTS 🎙️", theme=gr.themes.Soft()) as demo:
                 return_smooth = gr.Checkbox(
                     label="Return Smooth",
                     value=False,
-                    info="Smoother output at 24 kHz instead of 48 kHz",
+                    info="Smoother but less crisp; try this if you hear metallic sounds",
                 )
 
             with gr.Accordion("Advanced Settings", open=False):
                 model_path = gr.Textbox(
                     label="Model Path",
                     value=DEFAULT_MODEL_PATH,
-                    info="Hugging Face repo ID or local path",
+                    info="Hugging Face repo ID or local path (GPU only: the CPU/ONNX path always uses YatharthS/LuxTTS)",
                 )
                 device_choices = ["cpu"]
                 if torch.cuda.is_available():

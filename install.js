@@ -10,8 +10,8 @@ module.exports = {
         path: "app",
         message: [
           "python -c \"from pathlib import Path; Path('env/.installed').unlink(missing_ok=True)\"",
-          "uv pip install -r requirements.txt",
-          "uv pip install git+https://github.com/ysharma3501/LuxTTS.git --no-deps",
+          "uv pip install -r requirements.txt --reinstall-package linacodec",
+          "uv pip install git+https://github.com/ysharma3501/LuxTTS.git --no-deps --reinstall-package zipvoice",
         ],
       },
     },

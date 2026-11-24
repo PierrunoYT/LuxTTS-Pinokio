@@ -1,11 +1,12 @@
 --find-links https://k2-fsa.github.io/icefall/piper_phonemize.html
 
 # Gradio UI
-gradio>=4.0.0
+# <6: Gradio 6 moved `theme` from gr.Blocks() to launch(), which app.py doesn't use yet.
+gradio>=4.0.0,<6
 soundfile>=0.12.1
 
 # LuxTTS from Git (zipvoice.luxvoice); LinaCodec from Git (not on PyPI as used by LuxTTS).
-# torch / torchaudio: installed by torch.js in install.js (CUDA/ROCm/DirectML/CPU per machine).
+# torch / torchaudio: installed by torch.js in install.js (CUDA/ROCm/CPU per machine).
 numpy>=1.21.0
 lhotse
 huggingface_hub
